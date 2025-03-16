@@ -1,0 +1,2 @@
+const getAllExercise = {};
+const getExerciseById = {};
