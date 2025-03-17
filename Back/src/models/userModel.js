@@ -20,23 +20,28 @@ const userSchema = new mongoose.Schema(
       required: [true, "Please provide password"],
       minlength: 6,
     },
-    name: { type: String, required: true },
-    surname: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
+    name: {
+      type: String,
+      required: [true, "Please provide full name"],
+      minlength: 3,
+      maxlength: 35,
+    },
+
+    surname: { type: String, required: true },// not sure that is required, we can ask provide full name
+    username: { type: String, required: true, unique: true }, // not sure that is required
     phone: {
       type: String,
       default: "",
       match: [/^\+?[1-9]\d{1,14}$/, "Please provide a valid phone number"],
     },
-    role: { type: String, enum: ["user", "trainer", "admin"], default: "user" },
-    gender: { type: String, enum: ["male", "female", "other"], required: true },
-    weight: { type: Number, required: true },
-    height: { type: Number, required: true },
-    dateOfBirth: { type: Date, required: true },
+    role: { type: String, enum: ["user", "trainer", "admin"], default: "user" },// what admin shoul do?
+    gender: { type: String, enum: ["male", "female", "other", null], default: null }, //  null явно указывает, что поле не было заполнено. Это полезно для проверки в коде, чтобы отличить "поле не заполнено" от "поле заполнено пустой строкой или другим значением.
+    weight: { type: Number, default: null},  // нужно проверять наличие данных перед созданием тренировки.
+    dateOfBirth: { type: Date, default: null},
     fitnessLevel: {
       type: String,
       enum: ["beginner", "intermediate", "advanced"],
-      required: true,
+      default: null,
     },
     // createdAt: { type: Date, default: Date.now },
     favoriteWorkouts: {
@@ -50,23 +55,9 @@ const userSchema = new mongoose.Schema(
     goal: {
       type: String,
       enum: ["weight loss", "muscle gain", "maintenance"],
-      required: true,
+      default: null
     },
-    // Str.Goal
-    subscription: {
-      type: String,
-      enum: ["free", "premium", "expired"],
-      default: "free",
-    },
-    avatarUrl: { type: String, default: "" },
-    friends: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "User",
-      default: [],
-    },
-    devices: { type: [String], default: [] },
-    achievements: { type: [String], default: [] },
-    medicalConditions: { type: [String], default: [] },
+
   },
   { timestamps: true }
 );
@@ -84,7 +75,7 @@ userSchema.methods.createJWT = function () {
   return jwt.sign(
     { userId: this._id, username: this.username },
     process.env.JWT_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: process.env.JWT_LIFETIME }
   );
 };
 // для перезахода
@@ -95,12 +86,55 @@ userSchema.methods.createRefreshToken = function () {
 };
 // Метод для сравнения пароля при логине
 userSchema.methods.comparePassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  const isMatch = await bcrypt.compare(enteredPassword, this.password);
+  return isMatch;
 };
+
+// added to check if user exist
+
+userSchema.statics.checkExistUser = async function (body) {
+  const { email, password } = body;
+
+  if (!email || !password) {
+    return null;
+  }
+
+  const user = await this.findOne({ email });
+  if (!user) {
+    return null;
+  }
+
+  const isPasswordCorrect = await user.comparePassword(password);
+  if (!isPasswordCorrect) {
+    return null;
+  }
+
+  return user;
+
+};
+
 
 const User = mongoose.model("User", userSchema);
 export default User;
 
+
+
+
+    // Str.Goal commented 
+    // subscription: {
+    //   type: String,
+    //   enum: ["free", "premium", "expired"],
+    //   default: "free",
+    // },
+    // avatarUrl: { type: String, default: "" },
+    // friends: { // post MVP
+    //   type: [mongoose.Schema.Types.ObjectId], // post MVP
+    //   ref: "User", // post MVP
+    //   default: [],// post MVP
+    // },
+    // devices: { type: [String], default: [] }, // post MVP
+    // achievements: { type: [String], default: [] },  // post MVP
+    // medicalConditions: { type: [String], default: [] }, // post MVP
 /*
 вопросы и дополнения:
 1. userSchema.index({ role: 1 });
@@ -120,6 +154,11 @@ function arrayLimit(val) {
   (классно, что претир работает на комментарии.)
 
 
+
+
+
+
+
   сделать валидацию возраста, во избежание ошибок и всякого 
   dateOfBirth: {
   type: Date,
@@ -134,3 +173,17 @@ function arrayLimit(val) {
 },
 мне все равно, но для Дена можно показать
 */
+
+// как вариант я думала о предписанных значениях
+// const allowedAges = [20, 21, 22, 23, 24, 25 и тд]; // Добавьте все  значения
+
+// age: {
+//   type: Number,
+//   required: true,
+//   validate: {
+//     validator: function (value) {
+//       return allowedAges.includes(value);
+//     },
+//     message: "Age must be one of the following: 18 - 120", // Сообщение об ошибке
+//   },
+// },
