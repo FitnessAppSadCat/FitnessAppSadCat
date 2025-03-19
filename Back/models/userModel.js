@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     },
 
     surname: { type: String, required: true },// not sure that is required, we can ask provide full name
-    username: { type: String, required: true, unique: true }, // not sure that is required
+    username: { type: String, required: false, unique: true }, // никнейм
     phone: {
       type: String,
       default: "",

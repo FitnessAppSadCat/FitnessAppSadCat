@@ -46,3 +46,4 @@ export default authMiddleware;
 тут я просто немного модифицировал твой вариант под наш проект.
 надо дописывать Autification тут или в другой сделаем Middleware? 
 */
+// we have custom errors, better tose them, for exmp UnauthenticatedError
