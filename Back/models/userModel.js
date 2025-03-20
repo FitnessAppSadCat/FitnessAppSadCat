@@ -27,21 +27,21 @@ const userSchema = new mongoose.Schema(
       maxlength: 35,
     },
 
-    surname: { type: String, required: true },// not sure that is required, we can ask provide full name
-    username: { type: String, required: false, unique: true }, // никнейм
+    surname: { type: String, required: true }, 
+    // username: { type: String, required: true, unique: true }, // никнейм
     phone: {
       type: String,
-      default: "",
+     
       match: [/^\+?[1-9]\d{1,14}$/, "Please provide a valid phone number"],
     },
     role: { type: String, enum: ["user", "trainer", "admin"], default: "user" },// what admin shoul do?
-    gender: { type: String, enum: ["male", "female", "other", null], default: null }, //  null явно указывает, что поле не было заполнено. Это полезно для проверки в коде, чтобы отличить "поле не заполнено" от "поле заполнено пустой строкой или другим значением.
-    weight: { type: Number, default: null},  // нужно проверять наличие данных перед созданием тренировки.
-    dateOfBirth: { type: Date, default: null},
+    gender: { type: String, enum: ["male", "female", "other"] }, //  null явно указывает, что поле не было заполнено. Это полезно для проверки в коде, чтобы отличить "поле не заполнено" от "поле заполнено пустой строкой или другим значением.
+    weight: { type: Number},  // нужно проверять наличие данных перед созданием тренировки.
+    dateOfBirth: { type: Date},
     fitnessLevel: {
       type: String,
       enum: ["beginner", "intermediate", "advanced"],
-      default: null,
+
     },
     // createdAt: { type: Date, default: Date.now },
     favoriteWorkouts: {
@@ -55,7 +55,6 @@ const userSchema = new mongoose.Schema(
     goal: {
       type: String,
       enum: ["weight loss", "muscle gain", "maintenance"],
-      default: null
     },
 
   },
@@ -73,7 +72,7 @@ userSchema.pre("save", async function (next) {
 //  Метод для создания JWT-токена
 userSchema.methods.createJWT = function () {
   return jwt.sign(
-    { userId: this._id, username: this.username },
+    { userId: this._id, name: this.name },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_LIFETIME }
   );

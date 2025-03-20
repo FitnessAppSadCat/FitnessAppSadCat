@@ -11,9 +11,9 @@ const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000; // 15 минутное окно для счетчика попыток
 const LOCK_TIME = 15 * 60 * 1000; // блокировка IP на 15 минут при превышении попыток
 
-// register
+// register я убрала некоторые параметры, тк при регистрации только email, password, name, surname используем
 
-
+//   проверила, все работает
 async function register(req, res) {
   try {
     const { email, password, name, surname } = req.body;
@@ -32,12 +32,11 @@ async function register(req, res) {
       email,
       name,
       surname
-    
     );
     if (existingUser) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Email or username already exists" });
+        .json({ message: "Email or user already exists" });
     }
     // Создание нового пользователя
     const newUserData = {
@@ -92,7 +91,8 @@ async function register(req, res) {
 }
 
 
-// login
+// login   
+//   проверила, все работает
 
 
 async function login(req, res) {
@@ -158,13 +158,14 @@ async function login(req, res) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // я пока что не делал env. так что могут быть разные имена. потом добавлю одно ( а потом поменяем на secure: true)
       sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 дней
     });
     res.status(StatusCodes.OK).json({
       user: {
-        id: user._id,
+        id: user._id.toString(),
         name: user.name,
-        username: user.username,
-        role: user.role, // можно убрать , если не будем делать , но Ден вроде хотел
+        surname: user.surname,
+        // role: user.role, // можно убрать , если не будем делать , но Ден вроде хотел
       },
       accessToken,
     });
@@ -175,6 +176,10 @@ async function login(req, res) {
       .json({ message: "Login failed" });
   }
 }
+
+
+// logout
+//   проверила, все работает
 
 async function logout(req, res) {
   try {
@@ -203,6 +208,7 @@ async function logout(req, res) {
       .json({ message: "Logout failed" });
   }
 }
+//   проверила, все работает
 
 async function checkToken(req, res) {
   try {
@@ -217,8 +223,8 @@ async function checkToken(req, res) {
       user: {
         id: user._id,
         name: user.name,
-        username: user.username,
-        role: user.role,
+        surname: user.surname,
+        // role: user.role,
       },
     });
   } catch (error) {
