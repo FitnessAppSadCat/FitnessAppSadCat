@@ -15,11 +15,10 @@ const LOCK_TIME = 15 * 60 * 1000; // блокировка IP на 15 минут 
 
 
 async function register(req, res) {
-  console.log(req.body);
   try {
-    const { name, surname, email, password, } = req.body;
+    const { email, password, name, surname } = req.body;
     // Проверка обязательных полей
-    if ( !name || !surname || !email || !password ) {
+    if (!email || !password || !name || !surname) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "Please provide all required fields" });
@@ -30,8 +29,10 @@ async function register(req, res) {
 
 
     const existingUser = await userService.findByEmailOrUsername(
+      email,
       name,
-      email
+      surname
+    
     );
     if (existingUser) {
       return res
@@ -40,10 +41,10 @@ async function register(req, res) {
     }
     // Создание нового пользователя
     const newUserData = {
-      name,
-      surname,
       email,
       password,
+      name,
+      surname,
     };
 
     // Если phone не обязательное поле, можно использовать деструктуризацию с значением по умолчанию:
@@ -72,7 +73,7 @@ async function register(req, res) {
       user: {
         id: user._id.toString(),
         name: user.name,
-        username: user.username,
+        surname: user.surname,
         // role: user.role, // это на потом для Дена
       },
       accessToken,
