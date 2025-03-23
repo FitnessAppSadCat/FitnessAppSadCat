@@ -1,9 +1,7 @@
-// взять из  мой charactere и док документ Натальи
-// просто набор
+// filter customizedWorkout
 import mongoose from "mongoose";
 
-
-const workoutPlanSchema = new mongoose.Schema({
+const customWorkoutPlanSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String },
     exercises: [
@@ -13,10 +11,11 @@ const workoutPlanSchema = new mongoose.Schema({
         reps: { type: Number, default: 10 },
       },
     ],
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Кто создал план (тренер или админ)
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Пользователь, создавший план
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   });
 
-   const Workoutplan = mongoose.model("Workout", workoutPlanSchema);
-    export default Workoutplan;
+
+  const CustomWorkout = mongoose.model("CustomWorkout", customWorkoutPlanSchema);
+  export default CustomWorkout;
