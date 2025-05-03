@@ -4,6 +4,9 @@
   "type": "module",
   "description": "Back-End Repo for Team 3 of Ibis/Impala Practicum",
   "main": "src/server.js",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
