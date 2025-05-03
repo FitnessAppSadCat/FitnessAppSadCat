@@ -4,6 +4,9 @@ dotenv.config();
 import app from "./app.js";
 import connectDB from "../services/db.js";
 
+app.get("/", (req, res) => {
+  res.send("API is up and running!");
+});
 const PORT = process.env.PORT || 8000;
 
 const start = async () => {
