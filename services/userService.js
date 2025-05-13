@@ -1,4 +1,5 @@
 import User from "../src/models/UserModel.js";
+import Exercise from "../src/models/ExerciseModel.js";
 
 async function findByEmail(email, includePassword = false) {
   if (!email) throw new Error("Email is required");
@@ -46,6 +47,27 @@ async function deleteUser(userId) {
   return user;
 }
 
+async function addFavoriteExercise(userId, exerciseId) {
+  return await User.findByIdAndUpdate(
+    userId,
+    { $addToSet: { favoriteExercises: exerciseId } },
+    { new: true }
+  );
+}
+
+async function removeFavoriteExercise(userId, exerciseId) {
+  return await User.findByIdAndUpdate(
+    userId,
+    { $pull: { favoriteExercises: exerciseId } },
+    { new: true }
+  );
+}
+
+async function getFavoriteExercises(userId) {
+  const user = await User.findById(userId).populate("favoriteExercises");
+  return user?.favoriteExercises || [];
+}
+
 export {
   findByEmail,
   getUserById,
@@ -54,4 +76,7 @@ export {
   createUser,
   updateUser,
   deleteUser,
+  addFavoriteExercise,
+  removeFavoriteExercise,
+  getFavoriteExercises,
 };
