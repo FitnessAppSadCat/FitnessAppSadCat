@@ -17,10 +17,7 @@ import userUpdateProfileRouter from "./routes/userUpdateProfileRouter.js";
 import favoriteExercisesRouter from "./routes/favoriteExercisesRouter.js";
 import userInfoRouter from "./routes/userInfoRouter.js";
 // middleware
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://fitnessappsadcat.netlify.app",
-];
+const allowedOrigins = ["https://fitnessappsadcat.netlify.app"];
 
 app.use(
   cors({
