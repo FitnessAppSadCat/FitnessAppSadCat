@@ -17,17 +17,10 @@ import userUpdateProfileRouter from "./routes/userUpdateProfileRouter.js";
 import favoriteExercisesRouter from "./routes/favoriteExercisesRouter.js";
 import userInfoRouter from "./routes/userInfoRouter.js";
 // middleware
-const allowedOrigins = ["https://fitnessappsadcat.netlify.app"];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS: " + origin));
-      }
-    },
+    origin: "https://fitnessappsadcat.netlify.app",
     credentials: true,
   })
 );
